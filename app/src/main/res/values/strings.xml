@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SG Bootcamp Beacons</string>
+    <string name="app_name">Beacon Detector Smart Araucanía</string>
     <string name="start_button_text">Comenzar</string>
     <string name="stop_button_text">Parar</string>
     <string name="location_access_needed">Esta aplicación necesita acceso a la localización</string>
