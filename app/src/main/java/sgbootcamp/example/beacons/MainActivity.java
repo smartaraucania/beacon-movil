@@ -31,6 +31,14 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
@@ -45,6 +53,8 @@ import org.altbeacon.beacon.utils.UrlBeaconUrlCompressor;
 import java.io.Console;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import static sgbootcamp.example.beacons.App.CHANNEL_1_ID;
 
@@ -278,6 +288,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         notificationCreate();
 //                        createNotifyChannel();
 //                        createNotify();
+                        postRequest("distance|" + distance);
                     }
                 }
             } catch (Exception e) {
@@ -287,6 +298,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             showToastMessage(getString(R.string.no_beacons_detected));
         }
+    }
+
+    public void postRequest(String body) {
+//        Instantiate the RequestQueue.
+        String bodyDTemperature = "DTemperature|24";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = "https://fw-producer.smartaraucania.org/iota-north/iot/d?k=rdkdZrdvl2t2PlX3MdxgzhbI927L1uRm&i=distance%3ASB183&d=" + body;
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+//                        result_textview.setText("Post Done");
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+//                result_textview.setText("That didn't work!");
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "text/plain");
+                return headers;
+            }
+        };
+
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
     }
 
     public void notificationCreate() {
@@ -317,32 +361,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         notificationManagerCompat.notify(1, notification);
     }
 
-//    private void createNotifyChannel() {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            CharSequence name = "Notificacion";
-//            NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
-//            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//            notificationManager.createNotificationChannel(notificationChannel);
-//        }
-//    }
-//
-//    private void createNotify() {
-//        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID);
-//        builder.setSmallIcon(R.drawable.ic_baseline_wifi_tethering_24);
-//        builder.setContentTitle("Baliza detectada");
-//        builder.setContentText("Se ha detectado una baliza cerca!");
-//        builder.setColor(Color.CYAN);
-//        builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
-//        builder.setLights(Color.MAGENTA, 1000, 1000);
-//        builder.setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
-//        builder.setDefaults(Notification.DEFAULT_SOUND);
-//        builder.setContentIntent(pendingIntent);
-//
-//        NotificationManagerCompat nmc = NotificationManagerCompat.from(getApplicationContext());
-//        nmc.notify(NOTIFY_ID, builder.build());
-//        boolean areNotificationsEnabled = nmc.areNotificationsEnabled();
-//        System.out.println("notificaiones activas : " + areNotificationsEnabled);
-//    }
 
     public static double fijarNumero(double numero, int digitos) {
 
@@ -468,6 +486,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         dialog.show();
     }
+
 
     private Button getStartButton() {
         return (Button) findViewById(R.id.startReadingBeaconsButton);
